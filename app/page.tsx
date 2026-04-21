@@ -1,65 +1,75 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <section className="hero-card overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)] lg:items-end">
+          <div className="space-y-6">
+            <p className="eyebrow">A Quiet Corner On The Web</p>
+            <div className="space-y-4">
+              <h1 className="display-title max-w-3xl text-4xl leading-tight sm:text-5xl lg:text-6xl">
+                把学习、灵感与生活碎片，认真地排成一页页好看的文章。
+              </h1>
+              <p className="max-w-2xl text-base leading-8 text-[var(--ink-700)] sm:text-lg">
+                这里是我的个人站点，也是一个轻量博客。写代码、写随想、写日常，偶尔配上一张图片，
+                让每次记录都像一本正在慢慢成形的纸质杂志。
+              </p>
+            </div>
+          </div>
+
+          <aside className="section-card rounded-[1.75rem] p-6">
+            <p className="eyebrow">Site Notes</p>
+            <div className="mt-5 space-y-5 text-sm leading-7 text-[var(--ink-700)]">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--ink-500)]">
+                  01
+                </p>
+                <p className="mt-2">博客支持富文本编辑与插图，适合写图文并茂的长文。</p>
+              </div>
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--ink-500)]">
+                  02
+                </p>
+                <p className="mt-2">内容保存在本地 SQLite，轻量、直接，也很适合个人项目。</p>
+              </div>
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--ink-500)]">
+                  03
+                </p>
+                <p className="mt-2">整个站点现在是温暖纸张感的视觉方向，更像作品集而不是默认模板。</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-3">
+        <article className="section-card rounded-[1.75rem] p-6 lg:col-span-2">
+          <p className="eyebrow">Why I Write</p>
+          <h2 className="display-title mt-4 text-2xl sm:text-3xl">把零散念头，做成能回看的内容。</h2>
+          <p className="mt-4 max-w-3xl text-[15px] leading-8 text-[var(--ink-700)]">
+            不是为了堆积信息，而是为了让思考留下结构。每篇文章都可以是一次总结、一次实验记录，
+            或者一次对生活细节的认真观察。
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        </article>
+
+        <article className="section-card rounded-[1.75rem] p-6">
+          <p className="eyebrow">Start Here</p>
+          <p className="mt-5 text-sm leading-7 text-[var(--ink-700)]">
+            从上方导航进入博客即可阅读内容，后台入口改为通过 `/admin` 访问，不再在首页直接展示。
+          </p>
+        </article>
+      </section>
+
+      <footer className="mt-8 pb-2 pt-10 text-center text-sm text-[var(--ink-500)] sm:mt-12 sm:pt-14">
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          rel="noreferrer"
+          className="hover:text-[var(--ink-950)]"
+        >
+          湘ICP备2024092326号
+        </a>
+      </footer>
+    </main>
   );
 }
