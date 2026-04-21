@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import sanitizeHtml from "sanitize-html";
 import RichTextEditor from "@/components/rich-text-editor";
 import { isLoggedIn } from "@/lib/auth";
-import { createPost, getPosts } from "@/lib/db";
+import { createPost, deletePost, getPosts } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +72,25 @@ export default async function BlogPage() {
 
     createPost(title, safeContent, coverImage);
     revalidatePath("/blog");
+    redirect("/blog");
+  }
+
+  async function deletePostAction(formData: FormData) {
+    "use server";
+
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn) {
+      redirect("/blog");
+    }
+
+    const postId = Number(formData.get("post_id"));
+    if (!Number.isInteger(postId) || postId <= 0) {
+      redirect("/blog");
+    }
+
+    deletePost(postId);
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${postId}`);
     redirect("/blog");
   }
 
@@ -156,14 +175,25 @@ export default async function BlogPage() {
                   className="prose prose-sm mt-5 max-w-none text-[var(--ink-700)] sm:prose-base"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
-                <div className="mt-6">
+                <div className="mt-6 flex flex-wrap items-center gap-3">
                   <Link className="soft-button" href={`/blog/${post.id}`}>
                     阅读全文
                   </Link>
+                  {loggedIn ? (
+                    <form action={deletePostAction}>
+                      <input type="hidden" name="post_id" value={post.id} />
+                      <button
+                        type="submit"
+                        className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(174,86,36,0.28)] bg-white/70 px-4 py-2 text-sm text-[var(--accent-600)] shadow-[0_10px_28px_rgba(83,60,40,0.08)] hover:bg-white hover:text-[var(--ink-950)]"
+                      >
+                        删除
+                      </button>
+                    </form>
+                  ) : null}
                 </div>
               </div>
 
-              <div className="flex min-h-[220px] items-stretch bg-[rgba(255,255,255,0.45)]">
+              <div className="hidden min-h-[220px] items-stretch bg-[rgba(255,255,255,0.45)] lg:flex">
                 {post.image_url ? (
                   <Image
                     src={post.image_url}

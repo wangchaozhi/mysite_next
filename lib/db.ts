@@ -121,6 +121,96 @@ export function createPost(title: string, content: string, imageUrl: string | nu
   );
 }
 
+function getUploadUrl(value: string): string | null {
+  try {
+    const url = value.startsWith("/") ? new URL(value, "http://local.test") : new URL(value);
+    if (url.pathname.startsWith("/uploads/")) {
+      return url.pathname;
+    }
+  } catch {
+    if (value.startsWith("/uploads/")) {
+      return value.split(/[?#]/)[0] ?? value;
+    }
+  }
+
+  return null;
+}
+
+function getUploadUrlsFromContent(content: string): string[] {
+  const matches = content.matchAll(/<img[^>]+src=["']([^"']+)["']/gi);
+  const urls = new Set<string>();
+
+  for (const match of matches) {
+    const uploadUrl = getUploadUrl(match[1] ?? "");
+    if (uploadUrl) {
+      urls.add(uploadUrl);
+    }
+  }
+
+  return Array.from(urls);
+}
+
+function isUploadUrlReferencedByOtherPosts(uploadUrl: string, deletedPostId: number): boolean {
+  const row = db
+    .prepare(
+      `
+        SELECT 1
+        FROM posts
+        WHERE id != ?
+          AND (image_url = ? OR content LIKE ?)
+        LIMIT 1
+      `
+    )
+    .get(deletedPostId, uploadUrl, `%${uploadUrl}%`);
+
+  return Boolean(row);
+}
+
+function deleteUploadFile(uploadUrl: string): void {
+  const filename = path.basename(uploadUrl);
+  const filepath = path.join(process.cwd(), "public", "uploads", filename);
+
+  if (path.dirname(filepath) !== path.join(process.cwd(), "public", "uploads")) {
+    return;
+  }
+
+  try {
+    fs.unlinkSync(filepath);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
+export function deletePost(id: number): void {
+  const post = getPostById(id);
+  if (!post) {
+    return;
+  }
+
+  const uploadUrls = new Set(getUploadUrlsFromContent(post.content));
+  if (post.image_url) {
+    const uploadUrl = getUploadUrl(post.image_url);
+    if (uploadUrl) {
+      uploadUrls.add(uploadUrl);
+    }
+  }
+
+  const deletePostWithComments = db.transaction((postId: number) => {
+    db.prepare("DELETE FROM comments WHERE post_id = ?").run(postId);
+    db.prepare("DELETE FROM posts WHERE id = ?").run(postId);
+  });
+
+  deletePostWithComments(id);
+
+  for (const uploadUrl of uploadUrls) {
+    if (!isUploadUrlReferencedByOtherPosts(uploadUrl, id)) {
+      deleteUploadFile(uploadUrl);
+    }
+  }
+}
+
 export function getPostById(id: number): Post | undefined {
   return db
     .prepare("SELECT id, title, content, image_url, created_at FROM posts WHERE id = ?")

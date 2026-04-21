@@ -3,8 +3,10 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { isLoggedIn } from "@/lib/auth";
 import {
   createComment,
+  deletePost,
   getCommentAuthorNameByIp,
   getCommentsByPostId,
   getPostById,
@@ -58,6 +60,7 @@ export default async function BlogDetailPage(props: { params: Params; searchPara
     notFound();
   }
 
+  const loggedIn = await isLoggedIn();
   const headersList = await headers();
   const clientIp = getClientIpFromHeaders(headersList);
   const currentVisitorName =
@@ -80,14 +83,39 @@ export default async function BlogDetailPage(props: { params: Params; searchPara
     redirect(`/blog/${targetPostId}?comment=success#comments`);
   }
 
+  async function deletePostAction(targetPostId: number) {
+    "use server";
+
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn) {
+      redirect(`/blog/${targetPostId}`);
+    }
+
+    deletePost(targetPostId);
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${targetPostId}`);
+    redirect("/blog");
+  }
+
   const submitCommentAction = createCommentAction.bind(null, postId);
+  const submitDeleteAction = deletePostAction.bind(null, postId);
 
   return (
     <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link className="soft-button" href="/blog">
           返回博客列表
         </Link>
+        {loggedIn ? (
+          <form action={submitDeleteAction}>
+            <button
+              type="submit"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(174,86,36,0.28)] bg-white/70 px-4 py-2 text-sm text-[var(--accent-600)] shadow-[0_10px_28px_rgba(83,60,40,0.08)] hover:bg-white hover:text-[var(--ink-950)]"
+            >
+              删除
+            </button>
+          </form>
+        ) : null}
       </div>
 
       <article className="hero-card overflow-hidden rounded-[2rem]">
