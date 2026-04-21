@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {
@@ -99,19 +98,6 @@ export default async function BlogDetailPage(props: { params: Params; searchPara
           </h1>
           <p className="mt-4 text-sm tracking-[0.12em] text-[var(--ink-500)]">{post.created_at}</p>
         </div>
-
-        {post.image_url ? (
-          <div className="px-4 pt-4 sm:px-6">
-            <Image
-              src={post.image_url}
-              alt={post.title}
-              width={1200}
-              height={900}
-              sizes="(max-width: 1024px) 100vw, 960px"
-              className="h-auto w-full rounded-[1.5rem] object-cover"
-            />
-          </div>
-        ) : null}
 
         <div className="px-6 py-8 sm:px-10 sm:py-10">
           <div

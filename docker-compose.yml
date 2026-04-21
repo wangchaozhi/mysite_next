@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mysite_next:prod
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    volumes:
+      - blog_data:/app/data
+      - blog_uploads:/app/public/uploads
+
+volumes:
+  blog_data:
+  blog_uploads:

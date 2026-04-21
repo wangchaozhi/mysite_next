@@ -7,35 +7,41 @@ export default function Home() {
             <p className="eyebrow">A Quiet Corner On The Web</p>
             <div className="space-y-4">
               <h1 className="display-title max-w-3xl text-4xl leading-tight sm:text-5xl lg:text-6xl">
-                把学习、灵感与生活碎片，认真地排成一页页好看的文章。
+                把一寸光阴写慢，把一阵清风留下。
               </h1>
               <p className="max-w-2xl text-base leading-8 text-[var(--ink-700)] sm:text-lg">
-                这里是我的个人站点，也是一个轻量博客。写代码、写随想、写日常，偶尔配上一张图片，
-                让每次记录都像一本正在慢慢成形的纸质杂志。
+                山色不必远行才有，安静也不必等到深夜。愿这里像一张温柔的纸，
+                收住途中的微光、雨后的气息，以及那些忽然被生活照亮的句子。
               </p>
             </div>
           </div>
 
           <aside className="section-card rounded-[1.75rem] p-6">
-            <p className="eyebrow">Site Notes</p>
+            <p className="eyebrow">Small Chapters</p>
             <div className="mt-5 space-y-5 text-sm leading-7 text-[var(--ink-700)]">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--ink-500)]">
                   01
                 </p>
-                <p className="mt-2">博客支持富文本编辑与插图，适合写图文并茂的长文。</p>
+                <p className="mt-2">
+                  晨光落在窗沿，尘埃也有了方向；人间的清醒，常从一杯热茶开始。
+                </p>
               </div>
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--ink-500)]">
                   02
                 </p>
-                <p className="mt-2">内容保存在本地 SQLite，轻量、直接，也很适合个人项目。</p>
+                <p className="mt-2">
+                  风经过树梢，没有留下姓名，却把夏天翻成了另一页。
+                </p>
               </div>
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--ink-500)]">
                   03
                 </p>
-                <p className="mt-2">整个站点现在是温暖纸张感的视觉方向，更像作品集而不是默认模板。</p>
+                <p className="mt-2">
+                  慢慢走的人，也会抵达；只是他把路上的花影，都认真看了一遍。
+                </p>
               </div>
             </div>
           </aside>
@@ -44,18 +50,22 @@ export default function Home() {
 
       <section className="grid gap-6 lg:grid-cols-3">
         <article className="section-card rounded-[1.75rem] p-6 lg:col-span-2">
-          <p className="eyebrow">Why I Write</p>
-          <h2 className="display-title mt-4 text-2xl sm:text-3xl">把零散念头，做成能回看的内容。</h2>
+          <p className="eyebrow">A Gentle Essay</p>
+          <h2 className="display-title mt-4 text-2xl sm:text-3xl">
+            愿每一次回望，都有柔软的灯火。
+          </h2>
           <p className="mt-4 max-w-3xl text-[15px] leading-8 text-[var(--ink-700)]">
-            不是为了堆积信息，而是为了让思考留下结构。每篇文章都可以是一次总结、一次实验记录，
-            或者一次对生活细节的认真观察。
+            生活并不总是盛大的，它更多时候藏在细小处：一朵云的停留，一条街的黄昏，
+            一个人在忙碌之后忽然安静下来的瞬间。把这些写下来，不是为了抵抗遗忘，
+            而是为了在日后某个普通的夜晚，仍能听见当时心里的风声。
           </p>
         </article>
 
         <article className="section-card rounded-[1.75rem] p-6">
-          <p className="eyebrow">Start Here</p>
+          <p className="eyebrow">Read Slowly</p>
           <p className="mt-5 text-sm leading-7 text-[var(--ink-700)]">
-            从上方导航进入博客即可阅读内容，后台入口改为通过 `/admin` 访问，不再在首页直接展示。
+            从上方菜单进入博客，读一些短章，也读一些长句。愿文字像一条小径，
+            不急着抵达，只陪你把片刻走深。
           </p>
         </article>
       </section>

@@ -9,6 +9,11 @@ import { createPost, getPosts } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+function getFirstImageSrc(content: string): string | null {
+  const match = content.match(/<img[^>]+src="([^"]+)"/i);
+  return match?.[1] ?? null;
+}
+
 export default async function BlogPage() {
   const loggedIn = await isLoggedIn();
   const posts = getPosts();
@@ -38,20 +43,34 @@ export default async function BlogPage() {
         "br",
         "a",
         "img",
+        "u",
+        "s",
+        "pre",
+        "code",
+        "hr",
       ],
       allowedAttributes: {
+        p: ["style"],
+        h2: ["style"],
+        h3: ["style"],
         a: ["href", "target", "rel"],
         img: ["src", "alt"],
       },
       allowedSchemes: ["http", "https", "data"],
+      allowedStyles: {
+        "*": {
+          "text-align": [/^left$/, /^center$/, /^right$/],
+        },
+      },
     });
 
+    const coverImage = getFirstImageSrc(safeContent);
     const plainText = safeContent.replace(/<[^>]*>/g, "").trim();
-    if (!title || !plainText) {
+    if (!title || (!plainText && !coverImage)) {
       redirect("/blog");
     }
 
-    createPost(title, safeContent, null);
+    createPost(title, safeContent, coverImage);
     revalidatePath("/blog");
     redirect("/blog");
   }

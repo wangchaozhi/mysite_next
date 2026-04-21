@@ -1,17 +1,18 @@
 # mysite_next
 
-一个基于 Next.js 16、React 19 和 SQLite 的个人网站项目，包含首页展示、博客列表、文章详情、评论区、后台登录、富文本发文和图片上传能力。
+一个基于 Next.js 16、React 19 和 SQLite 的个人网站项目，包含首页、博客列表、文章详情、评论区、后台登录、富文本发文和图片上传能力。
 
 ## 功能特性
 
-- 首页展示个人站点风格化内容
-- 博客列表页展示全部文章
-- 文章详情页支持正文渲染与评论留言
-- 评论昵称基于访问者 IP 自动生成并复用
-- 后台登录后可直接在博客页发布文章
-- 集成 TipTap 富文本编辑器，支持插入图片
-- 本地上传图片并保存到 `public/uploads`
-- 使用 SQLite 持久化文章和评论数据
+- 首页展示个人站点内容
+- 博客列表与文章详情页
+- 评论区留言
+- 后台登录发布文章
+- TipTap 富文本编辑器
+- 图片上传并插入正文
+- 自动把正文第一张图保存为文章封面
+- SQLite 持久化文章与评论
+- Docker Compose 卷挂载持久化数据库和上传图片
 
 ## 技术栈
 
@@ -25,7 +26,7 @@
 
 ## 本地运行
 
-先安装依赖：
+安装依赖：
 
 ```bash
 npm install
@@ -63,14 +64,12 @@ http://localhost:3000
 
 ## 环境变量
 
-项目支持以下环境变量，建议在根目录创建 `.env.local`：
+建议在根目录创建 `.env.local`：
 
 ```env
 BLOG_ADMIN_PASSWORD=your-password
 BLOG_SESSION_TOKEN=your-custom-session-token
 ```
-
-说明：
 
 - `BLOG_ADMIN_PASSWORD`：后台登录密码，不设置时默认是 `admin`
 - `BLOG_SESSION_TOKEN`：登录态 cookie 对应的令牌，不设置时会基于密码自动生成
@@ -89,12 +88,33 @@ BLOG_SESSION_TOKEN=your-custom-session-token
 - SQLite 数据库文件默认保存在 `data/blog.sqlite`
 - 上传文件默认保存在 `public/uploads`
 - `data/` 和 `public/uploads/` 已加入忽略规则，不会默认提交到 Git
+- 使用 Docker Compose 时，`/app/data` 和 `/app/public/uploads` 会通过卷挂载持久化
 
 首次运行时会自动创建以下数据表：
 
 - `posts`
 - `comments`
 - `commenter_profiles`
+
+## Docker 运行
+
+构建并启动：
+
+```bash
+docker compose up -d --build
+```
+
+停止服务：
+
+```bash
+docker compose down
+```
+
+查看日志：
+
+```bash
+docker compose logs -f
+```
 
 ## 项目结构
 
@@ -112,6 +132,8 @@ lib/
   db.ts
 public/
   uploads/
+Dockerfile
+docker-compose.yml
 ```
 
 ## 后台发布流程
@@ -119,11 +141,11 @@ public/
 1. 打开 `/login`
 2. 输入管理员密码
 3. 登录成功后进入 `/blog`
-4. 在页面上方使用富文本编辑器发布文章
-5. 如需插图，可直接上传图片后插入正文
+4. 使用富文本编辑器发布文章
+5. 上传图片后会插入正文，正文第一张图会自动作为文章封面
 
 ## 备注
 
 - 当前项目使用本地 SQLite，适合个人站点或轻量内容管理场景
-- 评论作者名会根据 IP 自动生成，因此更适合简单留言场景
+- 评论作者名会根据 IP 自动生成，更适合简单留言场景
 - 如果部署到线上，建议务必配置自定义管理员密码和会话令牌

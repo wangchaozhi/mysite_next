@@ -173,6 +173,43 @@ textarea {
   outline: none;
 }
 
+.editor-surface .tiptap p.is-editor-empty:first-child::before {
+  color: var(--ink-500);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.editor-surface .tiptap pre,
+.prose pre {
+  overflow-x: auto;
+  border-radius: 1rem;
+  background: rgba(31, 26, 23, 0.92);
+  padding: 1rem;
+  color: var(--paper-50);
+}
+
+.editor-surface .tiptap code,
+.prose code {
+  border-radius: 0.4rem;
+  background: rgba(31, 26, 23, 0.08);
+  padding: 0.15rem 0.35rem;
+}
+
+.editor-surface .tiptap pre code,
+.prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.editor-surface .tiptap hr,
+.prose hr {
+  margin: 1.75rem 0;
+  border: 0;
+  border-top: 1px solid rgba(83, 72, 56, 0.18);
+}
+
 .prose img {
   max-width: 100%;
   height: auto;
