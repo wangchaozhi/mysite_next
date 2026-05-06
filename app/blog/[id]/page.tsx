@@ -4,12 +4,14 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLoggedIn } from "@/lib/auth";
+import { getPlainTextExcerpt, sanitizePostContent } from "@/lib/content";
 import {
   createComment,
   deletePost,
   getCommentAuthorNameByIp,
   getCommentsByPostId,
   getPostById,
+  isCommentRateLimited,
   previewCommentAuthorNameByIp,
 } from "@/lib/db";
 
@@ -42,7 +44,7 @@ export async function generateMetadata(props: { params: Params }): Promise<Metad
 
   return {
     title: post.title,
-    description: post.content.replace(/<[^>]*>/g, "").slice(0, 120),
+    description: getPlainTextExcerpt(post.content),
   };
 }
 
@@ -74,7 +76,7 @@ export default async function BlogDetailPage(props: { params: Params; searchPara
     const headersList = await headers();
     const clientIp = getClientIpFromHeaders(headersList);
 
-    if (!content || content.length > 500) {
+    if (!content || content.length > 500 || isCommentRateLimited(clientIp)) {
       redirect(`/blog/${targetPostId}?comment=error#comments`);
     }
 
@@ -130,7 +132,7 @@ export default async function BlogDetailPage(props: { params: Params; searchPara
         <div className="px-6 py-8 sm:px-10 sm:py-10">
           <div
             className="prose prose-sm max-w-none text-[var(--ink-700)] sm:prose-base md:prose-lg"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizePostContent(post.content) }}
           />
         </div>
       </article>

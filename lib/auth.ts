@@ -2,18 +2,38 @@ import crypto from "node:crypto";
 import { cookies } from "next/headers";
 
 const SESSION_COOKIE = "blog_session";
-const password = process.env.BLOG_ADMIN_PASSWORD ?? "admin";
+const password = process.env.BLOG_ADMIN_PASSWORD?.trim();
 const sessionToken =
   process.env.BLOG_SESSION_TOKEN ??
-  crypto.createHash("sha256").update(password).digest("hex");
+  (password ? crypto.createHash("sha256").update(password).digest("hex") : undefined);
+
+function constantTimeEquals(left: string, right: string): boolean {
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+
+  if (leftBuffer.length !== rightBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
 
 export async function isLoggedIn(): Promise<boolean> {
+  if (!sessionToken) {
+    return false;
+  }
+
   const cookieStore = await cookies();
-  return cookieStore.get(SESSION_COOKIE)?.value === sessionToken;
+  const currentToken = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!currentToken) {
+    return false;
+  }
+
+  return constantTimeEquals(currentToken, sessionToken);
 }
 
 export async function login(inputPassword: string): Promise<boolean> {
-  if (inputPassword !== password) {
+  if (!password || !sessionToken || !constantTimeEquals(inputPassword, password)) {
     return false;
   }
 

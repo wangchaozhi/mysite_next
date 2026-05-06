@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -50,11 +50,11 @@ export default function RichTextEditor({ name, defaultValue = "" }: Props) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  function syncHiddenInput(html?: string) {
+  const syncHiddenInput = useCallback((html: string) => {
     if (hiddenInputRef.current) {
-      hiddenInputRef.current.value = html ?? editor?.getHTML() ?? "";
+      hiddenInputRef.current.value = html;
     }
-  }
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -116,7 +116,7 @@ export default function RichTextEditor({ name, defaultValue = "" }: Props) {
       form.removeEventListener("submit", handleSubmit);
       form.removeEventListener("formdata", handleFormData);
     };
-  }, [editor, name]);
+  }, [editor, name, syncHiddenInput]);
 
   function setLink() {
     if (!editor) {

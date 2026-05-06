@@ -28,6 +28,14 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const db = new Database(dbPath);
+db.pragma("foreign_keys = ON");
+
+const clientHashSecret =
+  process.env.BLOG_IP_HASH_SECRET ?? process.env.BLOG_SESSION_TOKEN ?? "local-comment-secret";
+
+function createClientKey(clientIp: string): string {
+  return crypto.createHmac("sha256", clientHashSecret).update(clientIp).digest("hex");
+}
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS posts (
@@ -95,7 +103,7 @@ const nicknameNouns = [
 ];
 
 function createNicknameFromIp(clientIp: string): string {
-  const hash = crypto.createHash("sha256").update(clientIp).digest("hex");
+  const hash = createClientKey(clientIp);
   const adjectiveIndex = parseInt(hash.slice(0, 2), 16) % nicknameAdjectives.length;
   const nounIndex = parseInt(hash.slice(2, 4), 16) % nicknameNouns.length;
   const suffix = parseInt(hash.slice(4, 8), 16).toString().slice(-4).padStart(4, "0");
@@ -231,9 +239,10 @@ export function getCommentsByPostId(postId: number): Comment[] {
 }
 
 export function getCommentAuthorNameByIp(clientIp: string): string | undefined {
+  const clientKey = createClientKey(clientIp);
   const row = db
     .prepare("SELECT author_name FROM commenter_profiles WHERE client_ip = ?")
-    .get(clientIp) as { author_name: string } | undefined;
+    .get(clientKey) as { author_name: string } | undefined;
 
   return row?.author_name;
 }
@@ -244,22 +253,41 @@ export function getOrCreateCommentAuthorNameByIp(clientIp: string): string {
     return existingAuthorName;
   }
 
+  const clientKey = createClientKey(clientIp);
   const authorName = createNicknameFromIp(clientIp);
   db.prepare("INSERT INTO commenter_profiles (client_ip, author_name) VALUES (?, ?)").run(
-    clientIp,
+    clientKey,
     authorName
   );
 
   return authorName;
 }
 
+export function isCommentRateLimited(clientIp: string, cooldownSeconds = 60): boolean {
+  const clientKey = createClientKey(clientIp);
+  const row = db
+    .prepare(
+      `
+        SELECT 1
+        FROM comments
+        WHERE client_ip = ?
+          AND created_at >= datetime('now', ?)
+        LIMIT 1
+      `
+    )
+    .get(clientKey, `-${cooldownSeconds} seconds`);
+
+  return Boolean(row);
+}
+
 export function createComment(postId: number, clientIp: string, content: string): void {
+  const clientKey = createClientKey(clientIp);
   const authorName = getOrCreateCommentAuthorNameByIp(clientIp);
 
   db.prepare("INSERT INTO comments (post_id, author_name, content, client_ip) VALUES (?, ?, ?, ?)").run(
     postId,
     authorName,
     content,
-    clientIp
+    clientKey
   );
 }

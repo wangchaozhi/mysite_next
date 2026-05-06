@@ -2,17 +2,12 @@ import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import sanitizeHtml from "sanitize-html";
 import RichTextEditor from "@/components/rich-text-editor";
 import { isLoggedIn } from "@/lib/auth";
+import { getFirstImageSrc, getPlainTextExcerpt, sanitizePostContent } from "@/lib/content";
 import { createPost, deletePost, getPosts } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
-
-function getFirstImageSrc(content: string): string | null {
-  const match = content.match(/<img[^>]+src="([^"]+)"/i);
-  return match?.[1] ?? null;
-}
 
 export default async function BlogPage() {
   const loggedIn = await isLoggedIn();
@@ -29,43 +24,10 @@ export default async function BlogPage() {
     const title = String(formData.get("title") ?? "").trim();
     const contentHtml = String(formData.get("content_html") ?? "").trim();
 
-    const safeContent = sanitizeHtml(contentHtml, {
-      allowedTags: [
-        "p",
-        "h2",
-        "h3",
-        "ul",
-        "ol",
-        "li",
-        "strong",
-        "em",
-        "blockquote",
-        "br",
-        "a",
-        "img",
-        "u",
-        "s",
-        "pre",
-        "code",
-        "hr",
-      ],
-      allowedAttributes: {
-        p: ["style"],
-        h2: ["style"],
-        h3: ["style"],
-        a: ["href", "target", "rel"],
-        img: ["src", "alt"],
-      },
-      allowedSchemes: ["http", "https", "data"],
-      allowedStyles: {
-        "*": {
-          "text-align": [/^left$/, /^center$/, /^right$/],
-        },
-      },
-    });
+    const safeContent = sanitizePostContent(contentHtml);
 
     const coverImage = getFirstImageSrc(safeContent);
-    const plainText = safeContent.replace(/<[^>]*>/g, "").trim();
+    const plainText = getPlainTextExcerpt(safeContent);
     if (!title || (!plainText && !coverImage)) {
       redirect("/blog");
     }
@@ -173,7 +135,7 @@ export default async function BlogPage() {
                 <p className="mt-3 text-sm text-[var(--ink-500)]">{post.created_at}</p>
                 <div
                   className="prose prose-sm mt-5 max-w-none text-[var(--ink-700)] sm:prose-base"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizePostContent(post.content) }}
                 />
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <Link className="soft-button" href={`/blog/${post.id}`}>
