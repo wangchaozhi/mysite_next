@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
+import Image from "next/image";
 import { redirect } from "next/navigation";
-import { logout, isLoggedIn } from "@/lib/auth";
+import { isLoggedIn, logout } from "@/lib/auth";
 import NavLinks from "@/components/nav-links";
 import "./globals.css";
 
@@ -64,9 +65,19 @@ export default async function RootLayout({
                 <span className="font-mono text-[11px] uppercase tracking-[0.42em] text-[var(--ink-500)]">
                   Personal Journal
                 </span>
-                <span className="font-serif text-lg tracking-[0.18em] text-[var(--ink-950)]">
-                  林间手记
-                </span>
+                <div className="mt-2 flex items-center gap-3">
+                  <Image
+                    src="/site-title.jpg"
+                    alt="林间手记标题图片"
+                    width={44}
+                    height={44}
+                    priority
+                    className="size-11 rounded-2xl border border-white/70 object-cover shadow-[0_12px_24px_rgba(31,26,23,0.16)]"
+                  />
+                  <span className="font-serif text-lg tracking-[0.18em] text-[var(--ink-950)]">
+                    林间手记
+                  </span>
+                </div>
                 <a
                   href="https://github.com/wangchaozhi"
                   target="_blank"
